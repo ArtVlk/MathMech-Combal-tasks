@@ -1,9 +1,8 @@
 import sys
 from collections import deque
 
-
-def Ford_Fulkerson(F, s, t):
-    n = len(F)
+def Ford_Fulkerson(A, s, t):
+    n = len(A)
     F = [[0] * n for _ in range(n)]
     max_flow = 0
 
@@ -17,8 +16,8 @@ def Ford_Fulkerson(F, s, t):
             w = Q.popleft()
             for v in range(n):
                 # проверка на возможность продвижения по прямому ребру
-                if h[v] == -1 and F[w][v] - F[w][v] > 0:
-                    h[v] = min(h[w], F[w][v] - F[w][v])
+                if h[v] == -1 and A[w][v] - F[w][v] > 0:
+                    h[v] = min(h[w], A[w][v] - F[w][v])
                     prev[v] = w
                     Q.append(v)
                 # проверка на возможность продвижения по обратному ребру
@@ -42,7 +41,7 @@ def Ford_Fulkerson(F, s, t):
         v = t
         while v != s:
             w = prev[v]
-            if F[w][v] - F[w][v] >= flow:
+            if A[w][v] - F[w][v] >= flow:
                 F[w][v] += flow
             else:
                 F[v][w] -= flow
@@ -50,21 +49,21 @@ def Ford_Fulkerson(F, s, t):
 
     return F, max_flow
 
+# Чтение данных из файла in.txt
+with open('in.txt', 'r') as file:
+    lines = file.readlines()
 
-def main():
-    with open('in.txt', 'r') as f:
-        n = int(f.readline())
-        graph = [list(map(int, f.readline().split())) for _ in range(n)]
-        s = int(f.readline()) - 1
-        t = int(f.readline()) - 1
+n = int(lines[0].strip())  # количество вершин
+A = [list(map(int, lines[i + 1].strip().split())) for i in range(n)]  # матрица пропускных способностей
+s = int(lines[n + 1].strip()) - 1  # источник (индексы начинаются с 0)
+t = int(lines[n + 2].strip()) - 1  # сток (индексы начинаются с 0)
 
-    F, max_flow = Ford_Fulkerson(graph, s, t)
+# Решение задачи
+F, max_flow = Ford_Fulkerson(A, s, t)
 
-    with open('out.txt', 'w') as f:
-        for row in F:
-            f.write(' '.join(map(str, row)) + '\n')
-        f.write(str(max_flow))
+# Форматируем вывод
+output_fixed = '\n'.join(' '.join(map(str, row)) for row in F) + '\n' + str(max_flow)
 
-
-if __name__ == '__main__':
-    main()
+# Запись результатов в файл out.txt
+with open('out.txt', 'w') as file:
+    file.write(output_fixed)
